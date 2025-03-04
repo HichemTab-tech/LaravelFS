@@ -1,4 +1,4 @@
-# **LaravelFS - Community Laravel Full Starter-kits Installer**
+# **LaravelFS - Community Laravel Full Starter-kits Installer compatible with Laravel 12**
 
 **LaravelFS** was born from the idea of "Laravel Full Starter Kits" (or Full Stack) LOL – a way to bring back the legacy starter kits like Breeze and Jetstream that were removed from the official Laravel Installer, while still supporting the new Laravel 12 starter kits and custom solutions via Composer.
 
