@@ -64,12 +64,12 @@ A starter kit must meet the following requirements:
 - It must be a **Composer package of type `project`**.
 - It must be **published on Packagist** ([Submit your package here](https://packagist.org/packages/submit)).
 - It should provide a full Laravel project setup.
-- Check this repo for a reference [Forked from React Starter Kit](https://github.com/hichemtabtech/forked-from-react-starter-kit)
+- Check this repo for a reference [Forked from React Starter Kit](https://github.com/HichemTab-tech/forked-from-react-starter-kit)
 
 ---
 
 ## **Contributing**
-Thank you for considering contributing to LaravelFS! We welcome contributions to improve the installer and keep it updated. Please submit issues and pull requests to the [GitHub repository](https://github.com/HichemTab-tech/laravelfs).
+Thank you for considering contributing to LaravelFS! We welcome contributions to improve the installer and keep it updated. Please submit issues and pull requests to the [GitHub repository](https://github.com/HichemTab-tech/LaravelFS).
 
 ---
 
