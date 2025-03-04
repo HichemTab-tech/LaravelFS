@@ -166,33 +166,33 @@ class NewCommand extends Command
                 })(),
                 default => null,
             };
+        }
 
-            if ($input->getOption('breeze')) {
-                $this->promptForBreezeOptions($input);
-            } elseif ($input->getOption('jet')) {
-                $this->promptForJetstreamOptions($input);
-            }
+        if ($input->getOption('breeze')) {
+            $this->promptForBreezeOptions($input);
+        } elseif ($input->getOption('jet')) {
+            $this->promptForJetstreamOptions($input);
+        }
 
-            if ($this->usingStarterKit($input)) {
-                match (select(
-                    label: 'Which authentication provider do you prefer?',
-                    options: [
-                        'laravel' => "Laravel's built-in authentication",
-                        'workos' => 'WorkOS (Requires WorkOS account)',
-                    ],
-                    default: 'laravel',
-                )) {
-                    'laravel' => $input->setOption('workos', false),
-                    'workos' => $input->setOption('workos', true),
-                    default => null,
-                };
-            }
+        if ($this->usingStarterKit($input)) {
+            match (select(
+                label: 'Which authentication provider do you prefer?',
+                options: [
+                    'laravel' => "Laravel's built-in authentication",
+                    'workos' => 'WorkOS (Requires WorkOS account)',
+                ],
+                default: 'laravel',
+            )) {
+                'laravel' => $input->setOption('workos', false),
+                'workos' => $input->setOption('workos', true),
+                default => null,
+            };
+        }
 
-            if ($input->getOption('livewire') && ! $input->getOption('workos')) {
-                $input->setOption('livewire-class-components', ! confirm(
-                    label: 'Would you like to use Laravel Volt?',
-                ));
-            }
+        if ($input->getOption('livewire') && ! $input->getOption('workos')) {
+            $input->setOption('livewire-class-components', ! confirm(
+                label: 'Would you like to use Laravel Volt?',
+            ));
         }
 
         if ($this->usingStarterKit($input)) {
