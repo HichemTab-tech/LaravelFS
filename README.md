@@ -1,11 +1,7 @@
 # **LaravelFS - Community Laravel Full Starter-kits Installer**
-[![Latest Stable Version](https://poser.pugx.org/hichemtabtech/laravelfs/v/stable)](https://packagist.org/packages/hichemtabtech/laravelfs)
-[![Total Downloads](https://poser.pugx.org/hichemtabtech/laravelfs/downloads)](https://packagist.org/packages/hichemtabtech/laravelfs)
-[![License](https://poser.pugx.org/hichemtabtech/laravelfs/license)](LICENSE)
 
----
 
-🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as allowing **custom starter kits** via Composer.  
+> 🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as allowing **custom starter kits** via Composer.  
 We strive to keep it **up-to-date with Laravel's official installer** while offering extended flexibility. 🚀
 
 ---
