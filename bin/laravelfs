@@ -16,7 +16,7 @@ $laravelInstallerVersion = '5.13.0';
 $displayVersion = sprintf('%s (advanced from Laravel Installer %s)', $laravelFSVersion, $laravelInstallerVersion);
 
 $app = new Symfony\Component\Console\Application('LaravelFS Installer', $displayVersion);
-$app->add(new Laravel\Installer\Console\NewCommand);
+$app->add(new HichemTabTech\LaravelFS\Console\NewCommand);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $app->run();
