@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Installer\Console;
+namespace HichemTabTech\LaravelFS\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;

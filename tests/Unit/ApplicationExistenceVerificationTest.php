@@ -1,9 +1,9 @@
 <?php
 
-namespace Laravel\Installer\Console\Tests\Unit;
+namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
 use Exception;
-use Laravel\Installer\Console\NewCommand;
+use HichemTabTech\LaravelFS\Console\NewCommand;
 use RuntimeException;
 
 // Dummy command that exposes verifyApplicationDoesntExist for testing.

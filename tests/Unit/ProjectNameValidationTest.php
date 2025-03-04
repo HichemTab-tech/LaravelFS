@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Installer\Console\Tests\Unit;
+namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
-use Laravel\Installer\Console\NewCommand;
+use HichemTabTech\LaravelFS\Console\NewCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;

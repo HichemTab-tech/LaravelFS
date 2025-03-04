@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Installer\Console\Concerns;
+namespace HichemTabTech\LaravelFS\Console\Concerns;
 
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSelectPrompt;

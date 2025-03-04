@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Installer\Console\Tests\Unit;
+namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
-use Laravel\Installer\Console\NewCommand;
+use HichemTabTech\LaravelFS\Console\NewCommand;
 
 // Dummy command to expose custom starter kit validation logic.
 class DummyNewCommandCustomStarter extends NewCommand

@@ -35,12 +35,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Laravel\\Installer\\Console\\": "src/"
+            "HichemTabTech\\LaravelFS\\Console\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Laravel\\Installer\\Console\\Tests\\": "tests/"
+            "HichemTabTech\\LaravelFS\\Console\\Tests\\": "tests/"
         }
     },
     "config": {

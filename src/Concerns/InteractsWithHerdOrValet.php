@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Installer\Console\Concerns;
+namespace HichemTabTech\LaravelFS\Console\Concerns;
 
 use Symfony\Component\Process\Exception\ProcessStartFailedException;
 use Symfony\Component\Process\Process;
