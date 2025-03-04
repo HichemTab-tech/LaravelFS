@@ -26,7 +26,7 @@ LaravelFS functions similarly to the Laravel Installer but with **extra capabili
 To install LaravelFS globally, run:
 
 ```sh
-composer global require hichemtabtech/laravelfs
+composer global require hichemtab-tech/laravelfs
 ```
 
 Make sure **`~/.composer/vendor/bin`** (Mac/Linux) or **`%USERPROFILE%/AppData/Roaming/Composer/vendor/bin`** (Windows) is in your system's PATH to use the `laravelfs` command globally.
@@ -56,7 +56,7 @@ Even if these starter kits are abandoned, LaravelFS ensures they remain **availa
 LaravelFS allows you to install **custom Laravel starter kits** from Packagist by providing the package name:
 
 ```sh
-laravelfs new my-project --custom-starter=hichemtabtech/forked-from-react-starter-kit
+laravelfs new my-project --custom-starter=hichemtab-tech/forked-from-react-starter-kit
 ```
 
 🔹 **What qualifies as a Laravel starter kit?**  
