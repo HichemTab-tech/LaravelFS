@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+if (file_exists(__DIR__.'/../../../autoload.php')) {
+    /** @noinspection PhpIncludeInspection */
+    require __DIR__.'/../../../autoload.php';
+} else {
+    require __DIR__.'/../vendor/autoload.php';
+}
+
+$app = new Symfony\Component\Console\Application('LaravelFS Installer', '5.13.0');
+$app->add(new Laravel\Installer\Console\NewCommand);
+
+/** @noinspection PhpUnhandledExceptionInspection */
+$app->run();
