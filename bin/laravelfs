@@ -8,7 +8,14 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
     require __DIR__.'/../vendor/autoload.php';
 }
 
-$app = new Symfony\Component\Console\Application('LaravelFS Installer', '5.13.0');
+// Define our own version and the Laravel Installer version we aim to match.
+$laravelFSVersion = '1.0.0';
+$laravelInstallerVersion = '5.13.0';
+
+// Compose the displayed version string.
+$displayVersion = sprintf('%s (advanced from Laravel Installer %s)', $laravelFSVersion, $laravelInstallerVersion);
+
+$app = new Symfony\Component\Console\Application('LaravelFS Installer', $displayVersion);
 $app->add(new Laravel\Installer\Console\NewCommand);
 
 /** @noinspection PhpUnhandledExceptionInspection */

@@ -795,7 +795,7 @@ class NewCommand extends Command
      * @param OutputInterface $output
      * @return void
      */
-    protected function installPest(string $directory, InputInterface $input, OutputInterface $output): void
+    public function installPest(string $directory, InputInterface $input, OutputInterface $output): void
     {
         $composerBinary = $this->findComposer();
 
@@ -849,7 +849,7 @@ class NewCommand extends Command
      * @param OutputInterface $output
      * @return void
      */
-    protected function createRepository(string $directory, InputInterface $input, OutputInterface $output): void
+    public function createRepository(string $directory, InputInterface $input, OutputInterface $output): void
     {
         $branch = $input->getOption('branch') ?: $this->defaultBranch();
 

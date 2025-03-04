@@ -1,0 +1,53 @@
+name: Bug Report
+about: Report a bug in LaravelFS.
+title: "[BUG] "
+labels: bug
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the following sections to help us diagnose and fix the issue.
+  - type: input
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of the bug.
+      placeholder: "For example: When running 'laravelfs new', the installer fails with an error..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide step-by-step instructions to reproduce the bug.
+      placeholder: |
+        1. Run 'laravelfs new example-app'
+        2. Select 'custom' starter kit
+        3. Enter an invalid package name
+        4. Observe the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen.
+      placeholder: "A clear and concise description of what you expected to happen."
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Provide details such as OS, PHP version, and any other relevant environment information.
+      placeholder: "OS: Ubuntu 20.04, PHP: 8.4, Composer version: 2.x, etc."
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+      placeholder: "Add any other context about the problem here."

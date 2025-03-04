@@ -1,0 +1,21 @@
+name: Thank You Comment on New Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  thank-you:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post thank you comment tagging the issue author
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Thank you @${context.payload.issue.user.login} for opening this issue! We appreciate your feedback and will review your report as soon as possible.`
+            });
