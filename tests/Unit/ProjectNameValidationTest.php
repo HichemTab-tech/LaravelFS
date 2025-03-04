@@ -4,6 +4,8 @@ namespace Laravel\Installer\Console\Tests\Unit;
 
 use Laravel\Installer\Console\NewCommand;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use RuntimeException;
 
 // Create a dummy command to expose our inline validation callback.
@@ -27,9 +29,16 @@ class DummyNewCommand extends NewCommand
     // Expose the validation logic from the project name prompt.
     public function callProjectNameValidation(string $name, bool $force = false): ?string
     {
-        $input = new ArrayInput([]);
+        // Create an input definition with the "force" option.
+        $definition = new InputDefinition([
+            new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force installation even if directory exists'),
+        ]);
+
+        // Create an ArrayInput using our custom definition.
+        $input = new ArrayInput([], $definition);
         $input->setOption('force', $force);
 
+        // Inline validation callback from the original command.
         $validationCallback = function ($value) use ($input) {
             if (preg_match('/[^\pL\pN\-_.]/', $value) !== 0) {
                 return 'The name may only contain letters, numbers, dashes, underscores, and periods.';
@@ -38,7 +47,7 @@ class DummyNewCommand extends NewCommand
             if ($input->getOption('force') !== true) {
                 try {
                     $this->verifyApplicationDoesntExist($this->getInstallationDirectory($value));
-                } catch (RuntimeException $e) {
+                } catch (RuntimeException) {
                     return 'Application already exists.';
                 }
             }
