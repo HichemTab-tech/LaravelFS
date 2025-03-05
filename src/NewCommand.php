@@ -1202,7 +1202,7 @@ class NewCommand extends Command
         return implode(' ', $commandParts);
     }
 
-    private function saveTemplateCommand(mixed $templateName, mixed $templateDescription, string $templateCommand): void
+    protected function saveTemplateCommand(mixed $templateName, mixed $templateDescription, string $templateCommand): void
     {
         // Get the global config path for storing templates
         $configPath = $this->getGlobalTemplatesPath();

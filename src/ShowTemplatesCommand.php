@@ -5,12 +5,9 @@ namespace HichemTabTech\LaravelFS\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\info;
 use function Laravel\Prompts\intro;
-use function Laravel\Prompts\table;
 use function Laravel\Prompts\error;
 
 class ShowTemplatesCommand extends Command
@@ -50,20 +47,20 @@ class ShowTemplatesCommand extends Command
             }
 
             // Display the template
-            table(
+            $this->table(
                 ['Template Name', 'Description', 'Command'],
                 [$this->formatTemplates($template, $templates[$template])]
             );
         }
         else {
             // Format and display templates using Laravel Prompts table
-            table(
+            $this->table(
                 ['Template Name', 'Description', 'Command'],
                 array_map(fn($name, $template) => $this->formatTemplates($name, $template), array_keys($templates), $templates)
             );
         }
 
-        info('Use a template by calling <fg=cyan>`laravelfs use <template-name> <project-name>`<'.'/'.'>');
+        $this->info('Use a template by calling <fg=cyan>`laravelfs use <template-name> <project-name>`<'.'/'.'>');
     }
 
     private function formatTemplates($name, $data): array

@@ -11,11 +11,15 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use function Illuminate\Support\php_binary;
 use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\table;
 
 trait CommandsUtils
 {
 
-    private function getGlobalTemplatesPath(): string
+    public string $display = '';
+
+    protected function getGlobalTemplatesPath(): string
     {
         // Determine OS-specific config directory
         if (windows_os()) {
@@ -27,7 +31,7 @@ trait CommandsUtils
         return $configDir . '\templates.json';
     }
 
-    private function getSavedTemplates(bool $noInteract = false): array
+    protected function getSavedTemplates(bool $noInteract = false): array
     {
         // Get the global templates path
         $configPath = $this->getGlobalTemplatesPath();
@@ -158,5 +162,22 @@ trait CommandsUtils
         if ((is_dir($directory) || is_file($directory)) AND $directory != getcwd()) {
             throw new RuntimeException('Application already exists!');
         }
+    }
+
+    public function table(array $headers, array $rows): void
+    {
+        table($headers, $rows);
+        $this->display .= json_encode([$headers, $rows]);
+    }
+
+    public function info(string $message): void
+    {
+        info($message);
+        $this->display .= $message;
+    }
+
+    public function getDisplay(): string
+    {
+        return $this->display;
     }
 }
