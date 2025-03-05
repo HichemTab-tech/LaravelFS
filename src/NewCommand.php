@@ -351,7 +351,10 @@ class NewCommand extends Command
             }
 
             // Save the template globally
-            $this->saveTemplateCommand($templateName, $templateDescription, $templateCommand);
+            if (!$this->saveTemplateCommand($templateName, $templateDescription, $templateCommand)) {
+                error('Failed to save the template.');
+                return Command::FAILURE;
+            }
 
             $output->writeln("  <bg=blue;fg=white> INFO </> Template <options=bold>[$templateName]</> created successfully.");
             $output->writeln("  <fg=gray>➜</> You can now use this template by running <options=bold>laravelfs use $templateName</>");
@@ -1202,7 +1205,7 @@ class NewCommand extends Command
         return implode(' ', $commandParts);
     }
 
-    protected function saveTemplateCommand(mixed $templateName, mixed $templateDescription, string $templateCommand): void
+    protected function saveTemplateCommand(mixed $templateName, mixed $templateDescription, string $templateCommand): bool
     {
         // Get the global config path for storing templates
         $configPath = $this->getGlobalTemplatesPath();
@@ -1234,6 +1237,15 @@ class NewCommand extends Command
             'description' => $templateDescription??"",
             'command' => $templateCommand,
         ];
-        file_put_contents($configPath, json_encode($templatesConfig, JSON_PRETTY_PRINT));
+        $done = file_put_contents($configPath, json_encode($templatesConfig, JSON_PRETTY_PRINT)) !== false;
+        if (!$done) {
+            if (windows_os()) {
+                error('Failed to save the template. Please check the permissions of the directory.');
+            } else {
+                error('Failed to save the template. Please check the permissions of the file or use sudo.');
+            }
+        }
+
+        return $done;
     }
 }
