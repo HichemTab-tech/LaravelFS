@@ -73,7 +73,7 @@ This will prompt you the same way as `laravelfs new`, but instead of creating a 
 List all saved templates:
 
 ```sh
-laravelfs template:show
+laravelfs templates
 ```
 
 Or view a specific template:
