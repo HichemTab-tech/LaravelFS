@@ -19,9 +19,9 @@ trait CommandsUtils
     {
         // Determine OS-specific config directory
         if (windows_os()) {
-            $configDir = (getenv('APPDATA') ?: $_SERVER['APPDATA']) . '\laravelfs';
+            $configDir = (getenv('APPDATA') ?: $_SERVER['APPDATA']) . '\LaravelFS';
         } else {
-            $configDir = (getenv('XDG_CONFIG_HOME') ?: $_SERVER['HOME']) . '\.config\laravelfs';
+            $configDir = (getenv('XDG_CONFIG_HOME') ?: $_SERVER['HOME']) . '\.config\LaravelFS';
         }
 
         return $configDir . '\templates.json';
