@@ -1,0 +1,21 @@
+name: Thank You Comment on New Pull Request
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  thank-you-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post thank you comment for the pull request author
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Thank you @${context.payload.pull_request.user.login} for submitting this pull request! We greatly appreciate your contribution. Our team will review your PR soon. 🚀`
+            });
