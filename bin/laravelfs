@@ -9,7 +9,7 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
 }
 
 // Define our own version and the Laravel Installer version we aim to match.
-$laravelFSVersion = '1.0.0';
+$laravelFSVersion = '2.0.0';
 $laravelInstallerVersion = '5.13.0';
 
 // Compose the displayed version string.
@@ -17,6 +17,9 @@ $displayVersion = sprintf('%s (advanced from Laravel Installer %s)', $laravelFSV
 
 $app = new Symfony\Component\Console\Application('LaravelFS Installer', $displayVersion);
 $app->add(new HichemTabTech\LaravelFS\Console\NewCommand);
+$app->add(new HichemTabTech\LaravelFS\Console\NewTemplateCommand);
+$app->add(new HichemTabTech\LaravelFS\Console\ShowTemplatesCommand);
+$app->add(new HichemTabTech\LaravelFS\Console\UseTemplateCommand);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $app->run();
