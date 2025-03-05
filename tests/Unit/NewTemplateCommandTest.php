@@ -9,12 +9,13 @@ beforeEach(function () {
     // Create a dummy NewTemplateCommand that overrides saveTemplateCommand() to capture the saved template.
     $this->command = new class extends NewTemplateCommand {
         public array|null $savedTemplate = null;
-        public function saveTemplateCommand($templateName, $templateDescription, $templateCommand): void {
+        public function saveTemplateCommand($templateName, $templateDescription, $templateCommand): bool {
             $this->savedTemplate = [
                 'name'        => $templateName,
                 'description' => $templateDescription,
                 'command'     => $templateCommand,
             ];
+            return true;
         }
     };
 

@@ -131,6 +131,34 @@ A starter kit must meet the following requirements:
 
 ---
 
+## **🐧 Ubuntu Users: Fixing LaravelFS Command Not Found Issue**
+
+If you installed LaravelFS but **can’t run the `laravelfs` command**,
+it might be because Composer's global bin folder is **not in your system's PATH**.
+
+### **🔧 Solution: Add Composer Bin to PATH**
+1️⃣ Open your terminal and edit the `~/.bashrc` file:
+   ```sh
+   nano ~/.bashrc
+   ```  
+_(If needed, use `sudo nano ~/.bashrc`)_
+
+2️⃣ Add this line at the **bottom** of the file:
+   ```sh
+   export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+   ```  
+
+3️⃣ Save the file (`CTRL + X`, then `Y`, then `Enter`).
+
+4️⃣ Apply the changes:
+   ```sh
+   source ~/.bashrc
+   ```  
+
+✅ Now, try running `laravelfs` again—it should work! 🚀
+
+---
+
 ## **Contributing**
 Thank you for considering contributing to LaravelFS! We welcome contributions to improve the installer and keep it updated. Please submit issues and pull requests to the [GitHub repository](https://github.com/HichemTab-tech/LaravelFS).
 
