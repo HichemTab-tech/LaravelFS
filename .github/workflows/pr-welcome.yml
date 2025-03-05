@@ -1,0 +1,37 @@
+name: PR Welcome & Assign
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome-and-assign:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR Author
+        id: pr_author
+        run: echo "AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+
+      - name: Assign PR to Maintainer
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.addAssignees({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              assignees: ["HichemTab-tech"]
+            });
+
+      - name: Comment on PR (if not the maintainer)
+        #if: env.AUTHOR != 'HichemTab-tech'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "Thank you @${{ github.event.pull_request.user.login }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
+            });
