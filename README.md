@@ -15,6 +15,7 @@ LaravelFS functions similarly to the Laravel Installer but with **extra capabili
 ✅ Support for **Breeze and Jetstream**, even if they are abandoned.  
 ✅ Install **custom starter kits** from Packagist.  
 ✅ Save and reuse project setups with **Templates**.  
+✅ Easily **remove saved templates** when no longer needed.  
 ✅ Ensure that provided starter kits are **Composer packages of type `project`**.  
 ✅ CLI command to fetch additional details about a starter kit package.
 
@@ -90,6 +91,27 @@ laravelfs use my-template my-project
 ```
 
 This runs the exact same command as if you typed everything manually!
+
+---
+
+## **🗑️ Removing Templates**
+Need to clean up your templates? You can easily remove them.
+
+### **Remove a Specific Template**
+To delete a single template:
+
+```sh
+laravelfs template:remove my-template
+```
+
+### **Remove All Templates**
+To remove **all saved templates** at once:
+
+```sh
+laravelfs template:remove --all
+```
+
+> ⚠️ **This action is irreversible!** Make sure you want to delete all templates before running this command.
 
 ---
 
