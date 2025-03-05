@@ -59,7 +59,7 @@ Tired of typing the same options for every new Laravel project? With **LaravelFS
 To create a reusable template, use:
 
 ```sh
-laravelfs new:template my-template
+laravelfs template:new my-template
 ```
 
 This will prompt you the same way as `laravelfs new`, but instead of creating a project, it **saves your setup** as a template.
