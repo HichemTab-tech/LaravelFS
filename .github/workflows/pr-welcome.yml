@@ -1,12 +1,15 @@
-name: Thank You Comment on New Issue
+name: PR Welcome & Assign
 
 on:
-  issues:
+  pull_request:
     types: [opened]
 
 jobs:
-  thank-you:
+  welcome-and-assign:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Get PR Author
@@ -30,5 +33,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `👋 Thank you @${context.payload.issue.user.login} for opening this issue! We appreciate your feedback and will review your report as soon as possible.`
+              body: "👋 Thank you @${{ env.AUTHOR }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
             });

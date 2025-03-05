@@ -30,7 +30,7 @@ class DummyDatabaseOptionsCommand extends NewCommand
         if ($this->usingStarterKit($input)) {
             $input->setOption('database', 'sqlite');
             $migrate = false;
-        } elseif (! $input->getOption('database') && $input->isInteractive()) {
+        } elseif (! $input->getOption('database') AND $input->isInteractive()) {
             // Instead of calling the actual prompt, simulate the responses.
             $input->setOption('database', $simulatedDatabase ?? $defaultDatabase);
 

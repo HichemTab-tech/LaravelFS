@@ -4,8 +4,6 @@ namespace HichemTabTech\LaravelFS\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
-use Illuminate\Support\ProcessUtils;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
@@ -14,11 +12,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-use function Illuminate\Support\php_binary;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
@@ -27,6 +24,7 @@ class NewCommand extends Command
 {
     use Concerns\ConfiguresPrompts;
     use Concerns\InteractsWithHerdOrValet;
+    use Concerns\CommandsUtils;
 
     /**
      * The Composer instance.
@@ -34,6 +32,19 @@ class NewCommand extends Command
      * @var Composer
      */
     protected Composer $composer;
+
+    /**
+     * Determine if the command is creating a template.
+     *
+     * @var bool
+     */
+    protected bool $isCreatingTemplate;
+
+    public function __construct(bool $isCreatingTemplate = false)
+    {
+        $this->isCreatingTemplate = $isCreatingTemplate;
+        parent::__construct();
+    }
 
     /**
      * Configure the command options.
@@ -44,9 +55,11 @@ class NewCommand extends Command
     {
         $this
             ->setName('new')
-            ->setDescription('Create a new Laravel application')
-            ->addArgument('name', InputArgument::REQUIRED)
-            ->addOption('dev', null, InputOption::VALUE_NONE, 'Install the latest "development" release')
+            ->setDescription('Create a new Laravel application');
+        if (!$this->isCreatingTemplate()) {
+            $this->addArgument('name', InputArgument::REQUIRED);
+        }
+        $this->addOption('dev', null, InputOption::VALUE_NONE, 'Install the latest "development" release')
             ->addOption('git', null, InputOption::VALUE_NONE, 'Initialize a Git repository')
             ->addOption('branch', null, InputOption::VALUE_REQUIRED, 'The branch that should be created for a new repository', $this->defaultBranch())
             ->addOption('github', null, InputOption::VALUE_OPTIONAL, 'Create a new repository on GitHub', false)
@@ -78,6 +91,11 @@ class NewCommand extends Command
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
+    protected function isCreatingTemplate(): bool
+    {
+        return $this->isCreatingTemplate;
+    }
+
     /**
      * Interact with the user before validating the input.
      *
@@ -100,7 +118,55 @@ class NewCommand extends Command
 
         $this->ensureExtensionsAreAvailable();
 
-        if (! $input->getArgument('name')) {
+        if ($this->isCreatingTemplate()) {
+            if (!$input->getArgument('template-name')) {
+                $input->setArgument('template-name', text(
+                    label: 'What is the name this template',
+                    placeholder: 'E.g. template1, or-any-name-u-want',
+                    required: 'The template name is required.',
+                    validate: function ($value) use ($input) {
+                        if (preg_match('/[^\pL\pN\-_.]/', $value) !== 0) {
+                            return '<fg=bright-yellow>The template name may only contain letters, numbers, dashes, underscores, and periods.';
+                        }
+
+                        $templatesData = $this->getSavedTemplates(true);
+                        $templates = $templatesData['templates'];
+                        if (!empty($templates)) {
+                            if (isset($templates[$value])) {
+                                if (confirm(
+                                    label: 'A template with this name already exists. Would you like to overwrite it?',
+                                    default: false,
+                                )) {
+                                    return null;
+                                } else {
+                                    return '<fg=bright-yellow>A template with this name already exists. Please choose a different name.';
+                                }
+                            }
+                        }
+
+                        return null;
+                    },
+                    hint: 'This is the name of the template that will be used as a key to re-create the template later.',
+                ));
+            }
+
+            if (!$input->getArgument('template-description')) {
+                $input->setArgument('template-description', text(
+                    label: 'Provide a description for this template (Not required)',
+                    placeholder: 'E.g. A breeze starter with ssr,dark but no typescript',
+                    validate: function ($value) use ($input) {
+                        if (preg_match('/[^\pL\pN\-\s_.]/', $value) !== 0) {
+                            return 'The description may only contain letters, numbers, dashes, underscores, and periods.';
+                        }
+
+                        return null;
+                    },
+                    hint: 'This is a description for the template that will be used to describe the template.',
+                ));
+            }
+        }
+
+        if (!$this->isCreatingTemplate() AND !$input->getArgument('name')) {
             $input->setArgument('name', text(
                 label: 'What is the name of your project?',
                 placeholder: 'E.g. example-app',
@@ -123,13 +189,13 @@ class NewCommand extends Command
             ));
         }
 
-        if ($input->getOption('force') !== true) {
+        if ($input->getOption('force') !== true AND !$this->isCreatingTemplate()) {
             $this->verifyApplicationDoesntExist(
                 $this->getInstallationDirectory($input->getArgument('name'))
             );
         }
 
-        if (! $input->getOption('react') && ! $input->getOption('vue') && ! $input->getOption('livewire') && ! $input->getOption('breeze') && ! $input->getOption('jet') && ! $input->getOption('custom-starter')) {
+        if (!$input->getOption('react') AND !$input->getOption('vue') AND !$input->getOption('livewire') AND !$input->getOption('breeze') AND !$input->getOption('jet') AND !$input->getOption('custom-starter')) {
             match (select(
                 label: 'Which starter kit would you like to install?',
                 options: [
@@ -189,15 +255,15 @@ class NewCommand extends Command
             };
         }
 
-        if ($input->getOption('livewire') && ! $input->getOption('workos')) {
-            $input->setOption('livewire-class-components', ! confirm(
+        if ($input->getOption('livewire') AND !$input->getOption('workos')) {
+            $input->setOption('livewire-class-components', !confirm(
                 label: 'Would you like to use Laravel Volt?',
             ));
         }
 
         if ($this->usingStarterKit($input)) {
-            if (! $input->getOption('phpunit') &&
-                ! $input->getOption('pest')) {
+            if (!$input->getOption('phpunit') &&
+                !$input->getOption('pest')) {
                 $input->setOption('pest', select(
                     label: 'Which testing framework do you prefer?',
                     options: ['Pest', 'PHPUnit'],
@@ -205,7 +271,7 @@ class NewCommand extends Command
                 ) === 'Pest');
             }
         } elseif ($this->usingLegacyStarterKit($input)) {
-            if (! $input->getOption('phpunit') && ! $input->getOption('pest')) {
+            if (!$input->getOption('phpunit') AND !$input->getOption('pest')) {
                 $input->setOption('pest', select(
                         label: 'Which testing framework do you prefer?',
                         options: ['Pest', 'PHPUnit'],
@@ -260,6 +326,39 @@ class NewCommand extends Command
         $this->validateDatabaseOption($input);
         $this->validateStackOption($input);
 
+        if ($this->isCreatingTemplate()) {
+            // collect the options and create a single command
+            $templateName = $input->getArgument('template-name');
+            $templateDescription = $input->getArgument('template-description');
+            $templateCommand = $this->createTemplateCommand($input);
+
+            if (preg_match('/[^\pL\pN\-_.]/', $input->getArgument('template-name')) !== 0) {
+                error('<fg=bright-yellow>The template name may only contain letters, numbers, dashes, underscores, and periods.');
+                return Command::INVALID;
+            }
+            $templatesData = $this->getSavedTemplates(true);
+            $templates = $templatesData['templates'];
+            if (!empty($templates)) {
+                if (isset($templates[$input->getArgument('template-name')])) {
+                    if (!confirm(
+                        label: '<fg=bright-yellow>A template with this name already exists. Would you like to overwrite it?</>',
+                        default: false,
+                    )) {
+                        error('A template with this name already exists. Please choose a different name.');
+                        return Command::INVALID;
+                    }
+                }
+            }
+
+            // Save the template globally
+            $this->saveTemplateCommand($templateName, $templateDescription, $templateCommand);
+
+            $output->writeln("  <bg=blue;fg=white> INFO </> Template <options=bold>[$templateName]</> created successfully.");
+            $output->writeln("  <fg=gray>➜</> You can now use this template by running <options=bold>laravelfs use $templateName</>");
+
+            return Command::SUCCESS;
+        }
+
         $name = rtrim($input->getArgument('name'), '/\\');
 
         $directory = $this->getInstallationDirectory($name);
@@ -268,11 +367,11 @@ class NewCommand extends Command
 
         $version = $this->getVersion($input);
 
-        if (! $input->getOption('force')) {
+        if (!$input->getOption('force')) {
             $this->verifyApplicationDoesntExist($directory);
         }
 
-        if ($input->getOption('force') && $directory === '.') {
+        if ($input->getOption('force') AND $directory === '.') {
             throw new RuntimeException('Cannot use --force option when using current directory for installation!');
         }
 
@@ -311,15 +410,15 @@ class NewCommand extends Command
             $phpBinary." \"$directory/artisan\" key:generate --ansi",
         ];
 
-        if ($directory != '.' && $input->getOption('force')) {
-            if (PHP_OS_FAMILY == 'Windows') {
+        if ($directory != '.' AND $input->getOption('force')) {
+            if (windows_os()) {
                 array_unshift($commands, "(if exist \"$directory\" rd /s /q \"$directory\")");
             } else {
                 array_unshift($commands, "rm -rf \"$directory\"");
             }
         }
 
-        if (PHP_OS_FAMILY != 'Windows') {
+        if (!windows_os()) {
             $commands[] = "chmod 755 \"$directory/artisan\"";
         }
 
@@ -343,7 +442,7 @@ class NewCommand extends Command
                     $commands = [
                         trim(sprintf(
                             $this->phpBinary().' artisan migrate %s',
-                            ! $input->isInteractive() ? '--no-interaction' : '',
+                            !$input->isInteractive() ? '--no-interaction' : '',
                         )),
                     ];
 
@@ -376,7 +475,7 @@ class NewCommand extends Command
 
             $runNpm = $input->getOption('npm');
 
-            if (! $input->getOption('npm') && $input->isInteractive()) {
+            if (!$input->getOption('npm') AND $input->isInteractive()) {
                 $runNpm = confirm(
                     label: 'Would you like to run <options=bold>npm install</> and <options=bold>npm run build</>?'
                 );
@@ -389,8 +488,8 @@ class NewCommand extends Command
             $output->writeln("  <bg=blue;fg=white> INFO </> Application ready in <options=bold>[$name]</>. You can start your local development using:".PHP_EOL);
             $output->writeln('<fg=gray>➜</> <options=bold>cd '.$name.'</>');
 
-            if (! $runNpm) {
-                $output->writeln('<fg=gray>➜</> <options=bold>npm install && npm run build</>');
+            if (!$runNpm) {
+                $output->writeln('<fg=gray>➜</> <options=bold>npm install AND npm run build</>');
             }
 
             if ($this->isParkedOnHerdOrValet($directory)) {
@@ -421,7 +520,7 @@ class NewCommand extends Command
 
         $output = trim($process->getOutput());
 
-        return $process->isSuccessful() && $output ? $output : 'main';
+        return $process->isSuccessful() AND $output || 'main';
     }
 
     /**
@@ -450,7 +549,7 @@ class NewCommand extends Command
             $environment = file_get_contents($directory.'/.env');
 
             // If database options aren't commented, comment them for SQLite...
-            if (! str_contains($environment, '# DB_HOST=127.0.0.1')) {
+            if (!str_contains($environment, '# DB_HOST=127.0.0.1')) {
                 $this->commentDatabaseConfigurationForSqlite($directory);
 
                 return;
@@ -628,7 +727,7 @@ class NewCommand extends Command
             $input->setOption('database', 'sqlite');
         }
 
-        if (! $input->getOption('database') && $input->isInteractive()) {
+        if (!$input->getOption('database') AND $input->isInteractive()) {
             $input->setOption('database', select(
                 label: 'Which database will your application use?',
                 options: $databaseOptions,
@@ -673,7 +772,7 @@ class NewCommand extends Command
      */
     protected function validateDatabaseOption(InputInterface $input): void
     {
-        if ($input->getOption('database') && ! in_array($input->getOption('database'), $drivers = ['mysql', 'mariadb', 'pgsql', 'sqlite', 'sqlsrv'])) {
+        if ($input->getOption('database') AND !in_array($input->getOption('database'), $drivers = ['mysql', 'mariadb', 'pgsql', 'sqlite', 'sqlsrv'])) {
             throw new InvalidArgumentException("Invalid database driver [{$input->getOption('database')}]. Valid options are: ".implode(', ', $drivers).'.');
         }
     }
@@ -686,7 +785,7 @@ class NewCommand extends Command
     protected function validateStackOption(InputInterface $input): void
     {
         if ($input->getOption('breeze')) {
-            if (! in_array($input->getOption('stack'), $stacks = ['blade', 'livewire', 'livewire-functional', 'react', 'vue', 'api'])) {
+            if (!in_array($input->getOption('stack'), $stacks = ['blade', 'livewire', 'livewire-functional', 'react', 'vue', 'api'])) {
                 throw new InvalidArgumentException("Invalid Breeze stack [{$input->getOption('stack')}]. Valid options are: ".implode(', ', $stacks).'.');
             }
 
@@ -694,7 +793,7 @@ class NewCommand extends Command
         }
 
         if ($input->getOption('jet')) {
-            if (! in_array($input->getOption('stack'), $stacks = ['inertia', 'livewire'])) {
+            if (!in_array($input->getOption('stack'), $stacks = ['inertia', 'livewire'])) {
                 throw new InvalidArgumentException("Invalid Jetstream stack [{$input->getOption('stack')}]. Valid options are: ".implode(', ', $stacks).'.');
             }
         }
@@ -708,7 +807,7 @@ class NewCommand extends Command
      */
     protected function promptForBreezeOptions(InputInterface $input): void
     {
-        if (! $input->getOption('stack')) {
+        if (!$input->getOption('stack')) {
             $input->setOption('stack', select(
                 label: 'Which Breeze stack would you like to install?',
                 options: [
@@ -723,7 +822,7 @@ class NewCommand extends Command
             ));
         }
 
-        if (in_array($input->getOption('stack'), ['react', 'vue']) && (! $input->getOption('dark') || ! $input->getOption('ssr'))) {
+        if (in_array($input->getOption('stack'), ['react', 'vue']) AND (!$input->getOption('dark') || !$input->getOption('ssr'))) {
             collect(multiselect(
                 label: 'Would you like any optional features?',
                 options: [
@@ -739,7 +838,7 @@ class NewCommand extends Command
                     $input->getOption('eslint') ? 'eslint' : null,
                 ]),
             ))->each(fn ($option) => $input->setOption($option, true));
-        } elseif (in_array($input->getOption('stack'), ['blade', 'livewire', 'livewire-functional']) && ! $input->getOption('dark')) {
+        } elseif (in_array($input->getOption('stack'), ['blade', 'livewire', 'livewire-functional']) AND !$input->getOption('dark')) {
             $input->setOption('dark', confirm(
                 label: 'Would you like dark mode support?',
                 default: false,
@@ -755,7 +854,7 @@ class NewCommand extends Command
      */
     protected function promptForJetstreamOptions(InputInterface $input): void
     {
-        if (! $input->getOption('stack')) {
+        if (!$input->getOption('stack')) {
             $input->setOption('stack', select(
                 label: 'Which Jetstream stack would you like to install?',
                 options: [
@@ -782,7 +881,7 @@ class NewCommand extends Command
                 $input->getOption('dark') ? 'dark' : null,
                 $input->getOption('teams') ? 'teams' : null,
                 $input->getOption('verification') ? 'verification' : null,
-                $input->getOption('stack') === 'inertia' && $input->getOption('ssr') ? 'ssr' : null,
+                $input->getOption('stack') === 'inertia' AND $input->getOption('ssr') ? 'ssr' : null,
             ]),
         ))->each(fn ($option) => $input->setOption($option, true));
     }
@@ -834,7 +933,7 @@ class NewCommand extends Command
             );
         }
 
-        if (($input->getOption('react') || $input->getOption('vue') || $input->getOption('livewire')) && $input->getOption('phpunit')) {
+        if (($input->getOption('react') || $input->getOption('vue') || $input->getOption('livewire')) AND $input->getOption('phpunit')) {
             $this->deleteFile($directory.'/tests/Pest.php');
         }
 
@@ -874,7 +973,7 @@ class NewCommand extends Command
      */
     protected function commitChanges(string $message, string $directory, InputInterface $input, OutputInterface $output): void
     {
-        if (! $input->getOption('git') && $input->getOption('github') === false) {
+        if (!$input->getOption('git') AND $input->getOption('github') === false) {
             return;
         }
 
@@ -900,7 +999,7 @@ class NewCommand extends Command
         $process = new Process(['gh', 'auth', 'status']);
         $process->run();
 
-        if (! $process->isSuccessful()) {
+        if (!$process->isSuccessful()) {
             $output->writeln('  <bg=yellow;fg=black> WARN </> Make sure the "gh" CLI tool is installed and that you\'re authenticated to GitHub. Skipping...'.PHP_EOL);
 
             return;
@@ -934,19 +1033,6 @@ class NewCommand extends Command
 
             return $content;
         });
-    }
-
-    /**
-     * Verify that the application does not already exist.
-     *
-     * @param string $directory
-     * @return void
-     */
-    protected function verifyApplicationDoesntExist(string $directory): void
-    {
-        if ((is_dir($directory) || is_file($directory)) && $directory != getcwd()) {
-            throw new RuntimeException('Application already exists!');
-        }
     }
 
     /**
@@ -1006,17 +1092,6 @@ class NewCommand extends Command
     }
 
     /**
-     * Get the installation directory.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getInstallationDirectory(string $name): string
-    {
-        return $name !== '.' ? getcwd().'/'.$name : '.';
-    }
-
-    /**
      * Get the version that should be downloaded.
      *
      * @param InputInterface $input
@@ -1039,71 +1114,6 @@ class NewCommand extends Command
     protected function findComposer(): string
     {
         return implode(' ', $this->composer->findComposer());
-    }
-
-    /**
-     * Get the path to the appropriate PHP binary.
-     *
-     * @return string
-     */
-    protected function phpBinary(): string
-    {
-        $phpBinary = function_exists('Illuminate\Support\php_binary')
-            ? php_binary()
-            : (new PhpExecutableFinder)->find(false);
-
-        return $phpBinary !== false
-            ? ProcessUtils::escapeArgument($phpBinary)
-            : 'php';
-    }
-
-    /**
-     * Run the given commands.
-     *
-     * @param array $commands
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param  string|null  $workingPath
-     * @param  array  $env
-     * @return Process
-     */
-    protected function runCommands(array $commands, InputInterface $input, OutputInterface $output, ?string $workingPath = null, array $env = []): Process
-    {
-        if (! $output->isDecorated()) {
-            $commands = array_map(function ($value) {
-                if (Str::startsWith($value, ['chmod', 'git', $this->phpBinary().' ./vendor/bin/pest'])) {
-                    return $value;
-                }
-
-                return $value.' --no-ansi';
-            }, $commands);
-        }
-
-        if ($input->getOption('quiet')) {
-            $commands = array_map(function ($value) {
-                if (Str::startsWith($value, ['chmod', 'git', $this->phpBinary().' ./vendor/bin/pest'])) {
-                    return $value;
-                }
-
-                return $value.' --quiet';
-            }, $commands);
-        }
-
-        $process = Process::fromShellCommandline(implode(' && ', $commands), $workingPath, $env, null, null);
-
-        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
-            try {
-                $process->setTty(true);
-            } catch (RuntimeException $e) {
-                $output->writeln('  <bg=yellow;fg=black> WARN </> '.$e->getMessage().PHP_EOL);
-            }
-        }
-
-        $process->run(function ($type, $line) use ($output) {
-            $output->write('    '.$line);
-        });
-
-        return $process;
     }
 
     /**
@@ -1164,5 +1174,66 @@ class NewCommand extends Command
     protected function deleteFile(string $file): void
     {
         unlink($file);
+    }
+
+    private function createTemplateCommand(InputInterface $input): string
+    {
+        $commandParts = ['laravelfs', 'new', '<project-name>'];
+        $options = $input->getOptions();
+
+        foreach ($options as $key => $value) {
+            // Skip options that are false, null, or empty string.
+            if ($value === false || $value === null || $value === '') {
+                continue;
+            }
+
+            // If it's a boolean true, just add the flag.
+            if ($value === true) {
+                $commandParts[] = '--' . $key;
+            } else {
+                // Otherwise, add the option with its value.
+                $commandParts[] = sprintf('--%s=%s', $key, escapeshellarg($value));
+            }
+        }
+
+        // Add the --no-interaction flag.
+        $commandParts[] = '--no-interaction';
+
+        return implode(' ', $commandParts);
+    }
+
+    protected function saveTemplateCommand(mixed $templateName, mixed $templateDescription, string $templateCommand): void
+    {
+        // Get the global config path for storing templates
+        $configPath = $this->getGlobalTemplatesPath();
+
+        // Ensure the directory exists
+        $configDir = dirname($configPath);
+        if (!is_dir($configDir)) {
+            mkdir($configDir, 0755, true);
+        }
+
+        // Load existing templates if any
+        $templatesConfig = [
+            "templates" => []
+        ];
+        if (file_exists($configPath)) {
+            $templatesConfig = json_decode(file_get_contents($configPath), true) ?? [];
+            if (empty($templatesConfig)) {
+                $templatesConfig = [
+                    "templates" => []
+                ];
+            }
+            if (!isset($templatesConfig['templates'])) {
+                $templatesConfig['templates'] = [];
+            }
+        }
+
+        // Save the new template
+        $templatesConfig["templates"][$templateName] = [
+            'description' => $templateDescription??"",
+            'command' => $templateCommand,
+        ];
+        file_put_contents($configPath, json_encode($templatesConfig, JSON_PRETTY_PRINT));
     }
 }

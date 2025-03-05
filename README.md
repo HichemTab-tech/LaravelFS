@@ -2,7 +2,6 @@
 
 **LaravelFS** was born from the idea of "Laravel Full Starter Kits" (or Full Stack) LOL – a way to bring back the legacy starter kits like Breeze and Jetstream that were removed from the official Laravel Installer, while still supporting the new Laravel 12 starter kits and custom solutions via Composer.
 
-
 > 🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as allowing **custom starter kits** via Composer.  
 We strive to keep it **up-to-date with Laravel's official installer** while offering extended flexibility. 🚀
 
@@ -15,6 +14,7 @@ LaravelFS functions similarly to the Laravel Installer but with **extra capabili
 ✅ Install Laravel projects just like the official installer.  
 ✅ Support for **Breeze and Jetstream**, even if they are abandoned.  
 ✅ Install **custom starter kits** from Packagist.  
+✅ Save and reuse project setups with **Templates**.  
 ✅ Ensure that provided starter kits are **Composer packages of type `project`**.  
 ✅ CLI command to fetch additional details about a starter kit package.
 
@@ -49,6 +49,47 @@ laravelfs new my-project --jet
 ```
 
 Even if these starter kits are abandoned, LaravelFS ensures they remain **available for installation**.
+
+---
+
+## **🚀 New Feature: Templates!**
+Tired of typing the same options for every new Laravel project? With **LaravelFS Templates**, you can save your preferred project setup and reuse it anytime!
+
+### **Creating a Template**
+To create a reusable template, use:
+
+```sh
+laravelfs new:template my-template
+```
+
+This will prompt you the same way as `laravelfs new`, but instead of creating a project, it **saves your setup** as a template.
+
+> 📝 **Templates include:**
+> - Selected starter kits (Breeze, Jetstream, Vue, React, Livewire)
+> - Custom starter-kit options
+> - Extra flags like `--typescript`, `--ssr`, `--api`, etc.
+
+### **Viewing Saved Templates**
+List all saved templates:
+
+```sh
+laravelfs template:show
+```
+
+Or view a specific template:
+
+```sh
+laravelfs template:show my-template
+```
+
+### **Using a Template**
+Once saved, you can use your template anytime:
+
+```sh
+laravelfs use my-template my-project
+```
+
+This runs the exact same command as if you typed everything manually!
 
 ---
 
