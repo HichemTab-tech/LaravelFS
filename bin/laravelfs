@@ -9,7 +9,7 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
 }
 
 // Define our own version and the Laravel Installer version we aim to match.
-$laravelFSVersion = '1.1.0';
+$laravelFSVersion = '1.2.0';
 $laravelInstallerVersion = '5.13.0';
 
 // Compose the displayed version string.
@@ -20,6 +20,7 @@ $app->add(new HichemTabTech\LaravelFS\Console\NewCommand);
 $app->add(new HichemTabTech\LaravelFS\Console\NewTemplateCommand);
 $app->add(new HichemTabTech\LaravelFS\Console\ShowTemplatesCommand);
 $app->add(new HichemTabTech\LaravelFS\Console\UseTemplateCommand);
+$app->add(new HichemTabTech\LaravelFS\Console\RemoveTemplateCommand);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $app->run();

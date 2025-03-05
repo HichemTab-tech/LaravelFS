@@ -14,7 +14,7 @@ use function Laravel\Prompts\text;
 
 class UseTemplateCommand extends Command
 {
-    use Concerns\CommandsUtils, Concerns\ConfiguresPrompts;
+    use Concerns\CommandsUtils, Concerns\ConfiguresPrompts, Concerns\CommonTemplateUtils;
     protected function configure(): void
     {
         $this->setName('use')
@@ -39,14 +39,7 @@ class UseTemplateCommand extends Command
   |______\__,_|_|  \__,_| \_/ \___|_|</>'.PHP_EOL.PHP_EOL);
 
         if (!$input->getArgument('template-name')) {
-            $templatesData = $this->getSavedTemplates(true);
-            $templates = $templatesData['templates'];
-            $input->setArgument('template-name', text(
-                label: 'What is the name this template',
-                placeholder: count($templates) == 0 ? 'E.g. template1, or-any-name-u-want' : ('E.g. '.implode(', ', array_slice(array_keys($templates), 0, 3)).(count($templates) > 3 ? ', ...' : '')),
-                required: 'The template name is required.',
-                hint: 'This name is the key of the template you are searching for.',
-            ));
+            $this->ensureTemplateNameArgument($input);
         }
 
         if (!$input->getArgument('project-name')) {
