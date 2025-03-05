@@ -7,22 +7,21 @@ on:
 jobs:
   welcome-and-assign:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Get PR Author
         id: pr_author
         run: echo "AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
 
-      - name: Assign PR to Maintainer
-        uses: actions/github-script@v6
+      - name: 'Auto-assign issue'
+        uses: pozil/auto-assign-issue@39c06395cbac76e79afc4ad4e5c5c6db6ecfdd2e
         with:
-          script: |
-            github.issues.addAssignees({
-              issue_number: context.payload.pull_request.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              assignees: ["HichemTab-tech"]
-            });
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: HichemTab-tech
+          numOfAssignee: 1
 
       - name: Comment on PR (if not the maintainer)
         #if: env.AUTHOR != 'HichemTab-tech'
@@ -33,5 +32,5 @@ jobs:
               issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you @${{ github.event.pull_request.user.login }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
+              body: "Thank you @${{ env.AUTHOR }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
             });
