@@ -27,10 +27,11 @@ jobs:
         #if: env.AUTHOR != 'HichemTab-tech'
         uses: actions/github-script@v6
         with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.issues.createComment({
-              issue_number: context.payload.pull_request.number,
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you @${{ env.AUTHOR }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
+              body: "👋 Thank you @${{ env.AUTHOR }} for your contribution! 🎉\n\nYour PR has been received and is awaiting review. Please be patient while we check it. 🚀"
             });
