@@ -3,6 +3,7 @@
 namespace HichemTabTech\LaravelFS\Console;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +21,7 @@ class ShowTemplatesCommand extends Command
         $this->setName('template:show')
             ->setDescription('Show all saved templates')
             ->setHelp('This command shows all saved templates that you can use to create a new Laravel project.')
-            ->addArgument('template', InputOption::VALUE_OPTIONAL, 'Show a specific template')
+            ->addArgument('template', InputArgument::OPTIONAL, 'Show a specific template')
             ->setAliases(['templates']);
     }
 
