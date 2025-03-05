@@ -24,7 +24,7 @@ jobs:
           numOfAssignee: 1
 
       - name: Comment on PR (if not the maintainer)
-        #if: env.AUTHOR != 'HichemTab-tech'
+        if: env.AUTHOR != 'HichemTab-tech'
         uses: actions/github-script@v7.0.1
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}

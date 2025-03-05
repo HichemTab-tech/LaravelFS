@@ -9,13 +9,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Post thank you comment tagging the issue author
-        uses: actions/github-script@v6
+      - name: Get PR Author
+        id: pr_author
+        run: echo "AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+
+      - name: 'Auto-assign issue'
+        uses: pozil/auto-assign-issue@39c06395cbac76e79afc4ad4e5c5c6db6ecfdd2e
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: HichemTab-tech
+          numOfAssignee: 1
+
+      - name: Comment on PR (if not the maintainer)
+        if: env.AUTHOR != 'HichemTab-tech'
+        uses: actions/github-script@v7.0.1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Thank you @${context.payload.issue.user.login} for opening this issue! We appreciate your feedback and will review your report as soon as possible.`
+              body: `👋 Thank you @${context.payload.issue.user.login} for opening this issue! We appreciate your feedback and will review your report as soon as possible.`
             });
