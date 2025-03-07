@@ -77,7 +77,8 @@ class NewCommand extends Command
             ->addOption('teams', null, InputOption::VALUE_NONE, 'Indicates whether Jetstream should be scaffolded with team support')
             ->addOption('verification', null, InputOption::VALUE_NONE, 'Indicates whether Jetstream should be scaffolded with email verification support')
 
-            ->addOption('custom-starter', null, InputOption::VALUE_REQUIRED, 'Custom Starter (Provide your own starter-kit)')
+            ->addOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a custom starter kit from a community maintained package')
+            ->addOption('custom-starter', null, InputOption::VALUE_REQUIRED, 'Custom Starter (Provide your own starter-kit) same thing as --using', '')
 
             // from new installer
             ->addOption('react', null, InputOption::VALUE_NONE, 'Install the React Starter Kit')
@@ -117,6 +118,10 @@ class NewCommand extends Command
   |______\__,_|_|  \__,_| \_/ \___|_|</>'.PHP_EOL.PHP_EOL);
 
         $this->ensureExtensionsAreAvailable();
+
+        if ($input->getOption('using')) {
+            $input->setOption('custom-starter', $input->getOption('using'));
+        }
 
         if ($this->isCreatingTemplate()) {
             if (!$input->getArgument('template-name')) {
