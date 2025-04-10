@@ -180,3 +180,5 @@ LaravelFS is open-source software licensed under the **MIT license**.
 ---
 
 ### 🎉 **Happy coding with LaravelFS!** 🚀
+
+<!-- GitAds-Verify: ZTMTL65QQLBK2M8QF7CQJ5349NYAFJGJ -->
