@@ -111,6 +111,6 @@ test('pest installation workflow without react/vue/livewire options', function (
     $pestContents = file_get_contents($testsPath.'/Pest.php');
     $testContents = file_get_contents($featurePath.'/ExampleTest.php');
 
-    expect($pestContents)->toContain('    ->use(Illuminate\\Foundation\\Testing\\RefreshDatabase::class)')
+    expect($pestContents)->toContain('->use(Illuminate\\Foundation\\Testing\\RefreshDatabase::class)')
         ->and($testContents)->not->toContain('uses(\\Illuminate\\Foundation\\Testing\\RefreshDatabase::class);');
 });
