@@ -5,6 +5,8 @@
 > 🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as community starter kits via `--using`.  
 We strive to keep it **up-to-date with Laravel's official installer** while offering extended flexibility. 🚀
 
+> **Attribution:** LaravelFS is based on the open-source [laravel/installer](https://github.com/laravel/installer) project, licensed under MIT.
+
 ---
 
 ## **Official Documentation**
