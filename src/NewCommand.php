@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\NoReturn;
-use JsonException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
@@ -48,13 +47,7 @@ class NewCommand extends Command
      *
      * @var bool
      */
-    protected bool $isCreatingTemplate;
-
-    public function __construct(bool $isCreatingTemplate = false)
-    {
-        $this->isCreatingTemplate = $isCreatingTemplate;
-        parent::__construct();
-    }
+    protected bool $isCreatingTemplate = false;
 
     /**
      * Configure the command options.
@@ -112,6 +105,14 @@ class NewCommand extends Command
     }
 
     /**
+     * @param bool $isCreatingTemplate
+     */
+    public function setIsCreatingTemplate(bool $isCreatingTemplate): void
+    {
+        $this->isCreatingTemplate = $isCreatingTemplate;
+    }
+
+    /**
      * Interact with the user before validating the input.
      *
      * @param InputInterface $input
@@ -124,16 +125,11 @@ class NewCommand extends Command
 
         $this->configurePrompts($input, $output);
 
-        $this->checkForUpdate($input, $output);
-
-        $output->write(PHP_EOL.'  <fg=red> _                               _
-  | |                             | |
-  | |     __ _ _ __ __ ___   _____| |
-  | |    / _` |  __/ _` \ \ / / _ \ |
-  | |___| (_| | | | (_| |\ V /  __/ |
-  |______\__,_|_|  \__,_| \_/ \___|_|</>'.PHP_EOL.PHP_EOL);
+        $this->displayHeader($output);
 
         $this->ensureExtensionsAreAvailable();
+
+        $this->checkForUpdate($input, $output);
 
         if ($this->isCreatingTemplate()) {
             if (!$input->getArgument('template-name')) {
@@ -275,6 +271,45 @@ class NewCommand extends Command
             $input->setOption('boost', confirm(
                 label: 'Do you want to install Laravel Boost to improve AI assisted coding?',
             ));
+        }
+    }
+
+    /**
+     * Display the Laravel header with gradient colors.
+     *
+     * @param OutputInterface $output
+     * @return void
+     */
+    protected function displayHeader(OutputInterface $output): void
+    {
+        $output->writeln('');
+
+        $lines = [
+            ' ██╗       █████╗  ██████╗   █████╗  ██╗   ██╗ ███████╗ ██╗',
+            ' ██║      ██╔══██╗ ██╔══██╗ ██╔══██╗ ██║   ██║ ██╔════╝ ██║',
+            ' ██║      ███████║ ██████╔╝ ███████║ ██║   ██║ █████╗   ██║',
+            ' ██║      ██╔══██║ ██╔══██╗ ██╔══██║ ╚██╗ ██╔╝ ██╔══╝   ██║',
+            ' ███████╗ ██║  ██║ ██║  ██║ ██║  ██║  ╚████╔╝  ███████╗ ███████╗',
+            ' ╚══════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝   ╚═══╝   ╚══════╝ ╚══════╝',
+        ];
+
+        $gradients = [
+            'Red' => [196, 160, 124, 88, 52, 88],
+            'Gray' => [250, 248, 245, 243, 240, 238],
+            'Ocean' => [81, 75, 69, 63, 57, 21],
+            'Vaporwave' => [213, 177, 141, 105, 69, 39],
+            'Sunset' => [214, 208, 202, 196, 160, 124],
+            'Aurora' => [51, 50, 49, 48, 47, 41],
+            'Ember' => [227, 221, 215, 209, 203, 197],
+            'Cyberpunk' => [201, 165, 129, 93, 57, 21],
+        ];
+
+        $themeName = array_rand($gradients);
+        $gradient = $gradients[$themeName];
+
+        foreach ($lines as $index => $line) {
+            $color = $gradient[$index];
+            $output->writeln("\e[38;5;{$color}m$line\e[0m");
         }
     }
 
@@ -522,7 +557,6 @@ class NewCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -1311,7 +1345,6 @@ class NewCommand extends Command
      *
      * @param  NodePackageManager  $packageManager
      * @return void
-     * @throws JsonException
      */
     protected function configureComposerScripts(NodePackageManager $packageManager): void
     {
@@ -1341,7 +1374,6 @@ class NewCommand extends Command
      * Add boost:update command to the post-update-cmd Composer script.
      *
      * @return void
-     * @throws JsonException
      */
     protected function configureBoostComposerScript(): void
     {
