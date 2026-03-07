@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
 namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 

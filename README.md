@@ -1,8 +1,8 @@
 # **LaravelFS - Community Laravel Full Starter-kits Installer compatible with Laravel 12**
 
-**LaravelFS** was born from the idea of "Laravel Full Starter Kits" (or Full Stack) LOL – a way to bring back the legacy starter kits like Breeze and Jetstream that were removed from the official Laravel Installer, while still supporting the new Laravel 12 starter kits and custom solutions via Composer.
+**LaravelFS** was born from the idea of "Laravel Full Starter Kits" (or Full Stack) LOL – a way to bring back the legacy starter kits like Breeze and Jetstream that were removed from the official Laravel Installer, while still supporting the new Laravel 12 starter kits and community starter kits via `--using`.
 
-> 🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as allowing **custom starter kits** via Composer.  
+> 🚨 **Disclaimer:** This installer is **not officially supported by the Laravel team**. It's a **community-driven alternative** that extends the Laravel Installer by supporting **abandoned starter kits** like Breeze and Jetstream, as well as community starter kits via `--using`.  
 We strive to keep it **up-to-date with Laravel's official installer** while offering extended flexibility. 🚀
 
 ---
@@ -13,7 +13,7 @@ LaravelFS functions similarly to the Laravel Installer but with **extra capabili
 ### **Features:**
 ✅ Install Laravel projects just like the official installer.  
 ✅ Support for **Breeze and Jetstream**, even if they are abandoned.  
-✅ Install **custom starter kits** from Packagist.  
+✅ Install **community starter kits** via `--using` (Packagist or git URL).  
 ✅ Save and reuse project setups with **Templates**.  
 ✅ Easily **remove saved templates** when no longer needed.  
 ✅ Ensure that provided starter kits are **Composer packages of type `project`**.  
@@ -67,7 +67,7 @@ This will prompt you the same way as `laravelfs new`, but instead of creating a 
 
 > 📝 **Templates include:**
 > - Selected starter kits (Breeze, Jetstream, Vue, React, Livewire)
-> - Custom starter-kit options
+> - Starter-kit selection options
 > - Extra flags like `--typescript`, `--ssr`, `--api`, etc.
 
 ### **Viewing Saved Templates**
@@ -115,19 +115,15 @@ laravelfs template:remove --all
 
 ---
 
-## **Installing Custom Starter Kits**
-LaravelFS allows you to install **custom Laravel starter kits** from Packagist by providing the package name:
+## **Installing Community Starter Kits**
+LaravelFS allows you to install **community Laravel starter kits** by providing a package name or git URL:
 
 ```sh
-laravelfs new my-project --custom-starter=hichemtab-tech/forked-from-react-starter-kit
+laravelfs new my-project --using=hichemtab-tech/forked-from-react-starter-kit
 ```
 
 🔹 **What qualifies as a Laravel starter kit?**  
-A starter kit must meet the following requirements:
-- It must be a **Composer package of type `project`**.
-- It must be **published on Packagist** ([Submit your package here](https://packagist.org/packages/submit)).
-- It should provide a full Laravel project setup.
-- Check this repo for a reference [Forked from React Starter Kit](https://github.com/HichemTab-tech/forked-from-react-starter-kit)
+A starter kit should provide a full Laravel project setup. Packagist packages should be **Composer packages of type `project`** and published on Packagist ([Submit your package here](https://packagist.org/packages/submit)).
 
 ---
 
