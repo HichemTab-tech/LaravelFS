@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
 namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
@@ -27,7 +27,6 @@ class DummyDefaultCommand extends NewCommand
 beforeEach(function () {
     // Build an input definition with the necessary options.
     $definition = new InputDefinition([
-        new InputOption('custom-starter', null, InputOption::VALUE_REQUIRED, 'Custom starter kit package'),
         new InputOption('react', null, InputOption::VALUE_NONE),
         new InputOption('vue', null, InputOption::VALUE_NONE),
         new InputOption('livewire', null, InputOption::VALUE_NONE),
@@ -38,8 +37,7 @@ beforeEach(function () {
 });
 
 test('default laravel installation command without dev option', function () {
-    // Ensure no custom starter or stack options are set.
-    $this->input->setOption('custom-starter', null);
+    // Ensure no starter kit or stack options are set.
     $this->input->setOption('react', false);
     $this->input->setOption('vue', false);
     $this->input->setOption('livewire', false);
@@ -55,7 +53,6 @@ test('default laravel installation command without dev option', function () {
 
 test('default laravel installation command with dev option enabled', function () {
     // With the dev option set, the version should be "dev-master".
-    $this->input->setOption('custom-starter', null);
     $this->input->setOption('react', false);
     $this->input->setOption('vue', false);
     $this->input->setOption('livewire', false);

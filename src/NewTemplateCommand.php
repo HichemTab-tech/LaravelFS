@@ -6,13 +6,10 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class NewTemplateCommand extends NewCommand
 {
-    public function __construct()
-    {
-        parent::__construct(true);
-    }
 
     protected function configure(): void
     {
+        $this->setIsCreatingTemplate(true);
         parent::configure();
         $this->setName('template:new')
             ->setDescription('Create and save a custom starter template')

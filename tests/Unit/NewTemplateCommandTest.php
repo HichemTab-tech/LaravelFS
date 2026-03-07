@@ -3,13 +3,14 @@
 namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
 use HichemTabTech\LaravelFS\Console\NewTemplateCommand;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 beforeEach(function () {
     // Create a dummy NewTemplateCommand that overrides saveTemplateCommand() to capture the saved template.
     $this->command = new class extends NewTemplateCommand {
         public array|null $savedTemplate = null;
-        public function saveTemplateCommand($templateName, $templateDescription, $templateCommand): bool {
+        protected function saveTemplateCommand($templateName, $templateDescription, $templateCommand): bool {
             $this->savedTemplate = [
                 'name'        => $templateName,
                 'description' => $templateDescription,
@@ -19,7 +20,10 @@ beforeEach(function () {
         }
     };
 
-    $this->commandTester = new CommandTester($this->command);
+    $app = new Application('LaravelFS Installer');
+    $app->addCommand($this->command);
+
+    $this->commandTester = new CommandTester($app->find('template:new'));
 });
 
 test('new:template command generates and saves a template', function () {

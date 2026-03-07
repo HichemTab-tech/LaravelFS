@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
 namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
@@ -13,7 +13,6 @@ class DummyPestCommand extends NewCommand
 {
     public array $collectedCommands = [];
     public array $capturedEnv = [];
-    public array $replacedFiles = [];
     public array $committedMessages = [];
 
     // Override findComposer to return a fixed value.
@@ -34,12 +33,6 @@ class DummyPestCommand extends NewCommand
         $this->collectedCommands = $commands;
         $this->capturedEnv = $env;
         return new Process([]);
-    }
-
-    // Override replaceFile to capture file replacement parameters.
-    protected function replaceFile(string $replace, string $file): void
-    {
-        $this->replacedFiles[] = ['replace' => $replace, 'file' => $file];
     }
 
     // Override replaceInFile (not expected to be called in this scenario).
@@ -75,7 +68,21 @@ beforeEach(function () {
 });
 
 test('pest installation workflow without react/vue/livewire options', function () {
-    $directory = '/path/to/app';
+    $directory = sys_get_temp_dir().'/laravelfs-pest-'.uniqid();
+    $testsPath = $directory.'/tests';
+    $featurePath = $testsPath.'/Feature';
+
+    mkdir($featurePath, 0777, true);
+
+    file_put_contents(
+        $testsPath.'/Pest.php',
+        "<?php\n\n// ->use(Illuminate\\Foundation\\Testing\\RefreshDatabase::class)\n"
+    );
+
+    file_put_contents(
+        $featurePath.'/ExampleTest.php',
+        "<?php\n\nuses(\\Illuminate\\Foundation\\Testing\\RefreshDatabase::class);\n\nit('works', function () {\n    expect(true)->toBeTrue();\n});\n"
+    );
 
     // Ensure no starter kit options are set.
     $this->input->setOption('react', false);
@@ -92,13 +99,18 @@ test('pest installation workflow without react/vue/livewire options', function (
         'composer require pestphp/pest pestphp/pest-plugin-laravel --no-update --dev',
         'composer update',
         'php ./vendor/bin/pest --init',
+        'composer require pestphp/pest-plugin-drift --dev',
+        'php ./vendor/bin/pest --drift',
+        'composer remove pestphp/pest-plugin-drift --dev',
     ];
 
     expect($this->command->collectedCommands)->toEqual($expectedCommands)
         ->and($this->command->capturedEnv)->toEqual(['PEST_NO_SUPPORT' => 'true'])
-        ->and($this->command->replacedFiles)->toEqual([
-            ['replace' => 'pest/Feature.php', 'file' => $directory . '/tests/Feature/ExampleTest.php'],
-            ['replace' => 'pest/Unit.php', 'file' => $directory . '/tests/Unit/ExampleTest.php'],
-        ])
         ->and($this->command->committedMessages)->toContain('Install Pest');
+
+    $pestContents = file_get_contents($testsPath.'/Pest.php');
+    $testContents = file_get_contents($featurePath.'/ExampleTest.php');
+
+    expect($pestContents)->toContain('->use(Illuminate\\Foundation\\Testing\\RefreshDatabase::class)')
+        ->and($testContents)->not->toContain('uses(\\Illuminate\\Foundation\\Testing\\RefreshDatabase::class);');
 });

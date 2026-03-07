@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
 namespace HichemTabTech\LaravelFS\Console\Tests\Unit;
 
@@ -27,7 +27,7 @@ class DummyDatabaseOptionsCommand extends NewCommand
         $defaultDatabase = collect($databaseOptions)->keys()->first();
 
         // If a starter kit is used, automatically set database to sqlite.
-        if ($this->usingStarterKit($input)) {
+        if (! $input->getOption('database') && $this->usingStarterKit($input)) {
             $input->setOption('database', 'sqlite');
             $migrate = false;
         } elseif (! $input->getOption('database') AND $input->isInteractive()) {
@@ -54,7 +54,7 @@ beforeEach(function () {
         new InputOption('react', null, InputOption::VALUE_NONE, 'Install the React Starter Kit'),
         new InputOption('vue', null, InputOption::VALUE_NONE, 'Install the Vue Starter Kit'),
         new InputOption('livewire', null, InputOption::VALUE_NONE, 'Install the Livewire Starter Kit'),
-        new InputOption('custom-starter', null, InputOption::VALUE_NONE, 'Install a custom starter kit'),
+        new InputOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a community starter kit'),
     ]);
     $this->input = new ArrayInput([], $definition);
     $this->input->setInteractive(true);
