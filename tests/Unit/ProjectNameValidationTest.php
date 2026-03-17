@@ -23,7 +23,11 @@ class DummyNewCommand extends NewCommand
     // Expose getInstallationDirectory for testing.
     public function getInstallationDirectory(string $name): string
     {
-        return $name !== '.' ? getcwd() . '/' . $name : '.';
+        if ($name === '.') {
+            return '.';
+        }
+
+        return str_starts_with($name, DIRECTORY_SEPARATOR) ? $name : getcwd() . '/' . $name;
     }
 
     // Expose the validation logic from the project name prompt.

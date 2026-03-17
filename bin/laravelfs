@@ -10,7 +10,7 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
 
 // Define our own version and the Laravel Installer version we aim to match.
 $laravelFSVersion = '1.3.0';
-$laravelInstallerVersion = '5.24.7';
+$laravelInstallerVersion = '5.24.9';
 
 // Compose the displayed version string.
 $displayVersion = sprintf('%s (advanced from Laravel Installer %s)', $laravelFSVersion, $laravelInstallerVersion);

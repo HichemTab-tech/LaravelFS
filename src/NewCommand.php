@@ -96,6 +96,7 @@ class NewCommand extends Command
             ->addOption('bun', null, InputOption::VALUE_NONE, 'Install and build NPM dependencies via Bun')
             ->addOption('yarn', null, InputOption::VALUE_NONE, 'Install and build NPM dependencies via Yarn')
             ->addOption('boost', null, InputOption::VALUE_NONE, 'Install Laravel Boost to improve AI assisted coding')
+            ->addOption('no-boost', null, InputOption::VALUE_NONE, 'Skip Laravel Boost installation')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
@@ -267,7 +268,7 @@ class NewCommand extends Command
             ) === 'Pest');
         }
 
-        if (!$input->getOption('boost')) {
+        if (!$input->getOption('boost') && !$input->getOption('no-boost')) {
             $input->setOption('boost', confirm(
                 label: 'Do you want to install Laravel Boost to improve AI assisted coding?',
             ));
@@ -540,7 +541,15 @@ class NewCommand extends Command
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://laravel.com/new-install',
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => ['User-Agent: Laravel Installer'],
+            CURLOPT_HTTPHEADER => array_filter([
+                'User-Agent: Laravel Installer',
+                'X-Agent' => match (true) {
+                    isset($_SERVER['CLAUDECODE']) && $_SERVER['CLAUDECODE'] === '1' => 'Claude Code',
+                    isset($_SERVER['OPENCODE']) && $_SERVER['OPENCODE'] === '1' => 'OpenCode',
+                    isset($_SERVER['CURSOR_AGENT']) => 'Cursor',
+                    default => null,
+                },
+            ]),
             CURLOPT_TIMEOUT => 3,
         ]);
 
@@ -699,10 +708,6 @@ class NewCommand extends Command
                 $this->installPest($directory, $input, $output);
             }
 
-            if ($input->getOption('boost')) {
-                $this->installBoost($directory, $input, $output);
-            }
-
             if ($input->getOption('github') !== false) {
                 $this->pushToGitHub($name, $directory, $input, $output);
                 $output->writeln('');
@@ -711,11 +716,6 @@ class NewCommand extends Command
             [$packageManager, $runPackageManager] = $this->determinePackageManager($directory, $input);
 
             $this->configureComposerScripts($packageManager);
-
-            if ($input->getOption('boost')) {
-                $this->configureBoostComposerScript();
-                $this->commitChanges('Configure Boost post-update script', $directory, $input, $output);
-            }
 
             if ($input->getOption('pest')) {
                 $output->writeln('');
@@ -735,6 +735,15 @@ class NewCommand extends Command
 
             if ($runPackageManager) {
                 $this->runCommands([$packageManager->installCommand(), $packageManager->buildCommand()], $input, $output, workingPath: $directory);
+            }
+
+            if ($input->getOption('boost') && ! $input->getOption('no-boost')) {
+                $this->installBoost($directory, $input, $output);
+            }
+
+            if ($input->getOption('boost') && ! $input->getOption('no-boost')) {
+                $this->configureBoostComposerScript();
+                $this->commitChanges('Configure Boost post-update script', $directory, $input, $output);
             }
 
             $output->writeln("  <bg=blue;fg=white> INFO </> Application ready in <options=bold>[$name]</>. You can start your local development using:".PHP_EOL);
