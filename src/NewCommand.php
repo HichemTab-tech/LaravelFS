@@ -537,18 +537,19 @@ class NewCommand extends Command
     protected function pingNewInstallUrl(): void
     {
         $curl = curl_init();
+        $agentHeader = match (true) {
+            isset($_SERVER['CLAUDECODE']) && $_SERVER['CLAUDECODE'] === '1' => 'Claude Code',
+            isset($_SERVER['OPENCODE']) && $_SERVER['OPENCODE'] === '1' => 'OpenCode',
+            isset($_SERVER['CURSOR_AGENT']) => 'Cursor',
+            default => null,
+        };
 
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://laravel.com/new-install',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array_filter([
                 'User-Agent: Laravel Installer',
-                'X-Agent' => match (true) {
-                    isset($_SERVER['CLAUDECODE']) && $_SERVER['CLAUDECODE'] === '1' => 'Claude Code',
-                    isset($_SERVER['OPENCODE']) && $_SERVER['OPENCODE'] === '1' => 'OpenCode',
-                    isset($_SERVER['CURSOR_AGENT']) => 'Cursor',
-                    default => null,
-                },
+                $agentHeader ? 'X-Agent: '.$agentHeader : null,
             ]),
             CURLOPT_TIMEOUT => 3,
         ]);
@@ -739,9 +740,6 @@ class NewCommand extends Command
 
             if ($input->getOption('boost') && ! $input->getOption('no-boost')) {
                 $this->installBoost($directory, $input, $output);
-            }
-
-            if ($input->getOption('boost') && ! $input->getOption('no-boost')) {
                 $this->configureBoostComposerScript();
                 $this->commitChanges('Configure Boost post-update script', $directory, $input, $output);
             }
