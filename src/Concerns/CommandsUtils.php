@@ -148,7 +148,11 @@ trait CommandsUtils
      */
     protected function getInstallationDirectory(string $name): string
     {
-        return $name !== '.' ? getcwd().'/'.$name : '.';
+        if ($name === '.') {
+            return '.';
+        }
+
+        return str_starts_with($name, DIRECTORY_SEPARATOR) ? $name : getcwd().'/'.$name;
     }
 
     /**
